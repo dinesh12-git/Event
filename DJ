@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diamond Jubilee Registration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: auto;
+            padding-left: 20px; /* Left-side gap */
+        }
+        label, input, select, textarea {
+            display: block;
+            margin: 10px 0;
+        }
+        .flex-container {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .flex-label {
+            flex: 1; /* Takes up 1/3rd of the row */
+            font-weight: bold;
+        }
+        .flex-option {
+            flex: 1; /* Each option takes up 1/3rd of the row */
+            display: flex;
+            align-items: center;
+        }
+        .donation-container {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .donation-label {
+            flex: 1;
+            font-weight: bold;
+        }
+        .donation-options {
+            flex: 2;
+            display: flex;
+            gap: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Diamond Jubilee Event Registration Form</h2>
+    <h3>Date: 25-05-2025</h3>
+
+    <form id="registrationForm">
+        <!-- Page 1 -->
+        <h3>WhatsApp Number</h3>
+        <label for="whatsappIndia">WhatsApp Number (India):</label>
+        <input type="text" id="whatsappIndia" name="whatsappIndia" required>
+
+        <label for="whatsappOther">WhatsApp Number (Other Countries):</label>
+        <input type="text" id="whatsappOther" name="whatsappOther">
+
+        <!-- Page 2 -->
+        <h3>Personal Information</h3>
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+
+        <!-- Passed Out Class Section with Left, Middle, Right alignment -->
+        <h3>Passed Out Class</h3>
+        <div class="flex-container">
+            <div class="flex-label">Passed Out Class:</div>
+            <div class="flex-option">
+                <input type="radio" id="class10" name="passedOutClass" value="10th" required>
+                <label for="class10">10th</label>
+            </div>
+            <div class="flex-option">
+                <input type="radio" id="class12" name="passedOutClass" value="12th" required>
+                <label for="class12">12th</label>
+            </div>
+            <div class="flex-option">
+                <input type="radio" id="classOther" name="passedOutClass" value="others" required>
+                <label for="classOther">Others</label>
+            </div>
+        </div>
+
+        <label for="passedOutYear">Passed Out Year:</label>
+        <input type="text" id="passedOutYear" name="passedOutYear" required>
+
+        <label for="membersCount">How many members are coming for the DJ event?</label>
+        <input type="number" id="membersCount" name="membersCount" min="1" required>
+
+        <!-- Updated Attendees Section -->
+        <h3>Attendees</h3>
+        <label>Who are all coming for DJ meets *</label>
+        <label><input type="checkbox" name="attendees" value="alumni" data-price="1500" onchange="calculateTotal()"> Alumni (1500 Rs)</label>
+        <label><input type="checkbox" name="attendees" value="spouse" data-price="1000" onchange="calculateTotal()"> Spouse (1000 Rs)</label>
+
+        <label for="children">Select the number of children above 5 years *</label>
+        <select id="children" name="children" required onchange="calculateTotal()">
+            <option value="0" data-price="0">0</option>
+            <option value="1" data-price="750">1 Child (750 Rs)</option>
+            <option value="2" data-price="1500">2 Children (1500 Rs)</option>
+            <option value="3" data-price="2250">3 Children (2250 Rs)</option>
+            <option value="4" data-price="3000">4 Children (3000 Rs)</option>
+            <option value="5" data-price="3750">5 Children (3750 Rs)</option>
+        </select>
+
+        <!-- Display total amount -->
+        <h3>Total Amount</h3>
+        <p id="totalAmount">Total: 0 Rs</p>
+
+        <!-- Page 3 -->
+        <h3>Donation</h3>
+        <div class="donation-container">
+            <div class="donation-label">Would you like to donate for the DJ event?</div>
+            <div class="donation-options">
+                <input type="radio" id="donateYes" name="donate" value="yes" required onclick="toggleDonationAmount(true)">
+                <label for="donateYes">Yes</label>
+                <input type="radio" id="donateNo" name="donate" value="no" required onclick="toggleDonationAmount(false)">
+                <label for="donateNo">No</label>
+            </div>
+        </div>
+
+        <label for="donationAmount">If Yes, How much amount:</label>
+        <input type="number" id="donationAmount" name="donationAmount" min="0" disabled>
+
+        <!-- Payment Details -->
+        <h3>Payment Details</h3>
+        <p><strong>Bank Account Details:</strong></p>
+        <p>Indian Overseas Bank</p>
+        <p>Account Number: 094101000023408</p>
+        <p>IFSC Code: IOB0000941</p>
+        
+        <!-- Updated Bold Text for Upload Payment Screenshot -->
+        <label for="paymentScreenshot" style="font-weight: bold;">Upload Payment Screenshot:</label>
+        <input type="file" id="paymentScreenshot" name="paymentScreenshot" accept="image/*" required>
+
+        <button type="button" onclick="submitForm()">Submit</button>
+    </form>
+
+    <script>
+        function toggleDonationAmount(isYes) {
+            const donationAmountField = document.getElementById('donationAmount');
+            if (isYes) {
+                donationAmountField.disabled = false;
+                donationAmountField.required = true;
+            } else {
+                donationAmountField.disabled = true;
+                donationAmountField.required = false;
+                donationAmountField.value = ''; // Clear the field if "No" is selected
+            }
+        }
+
+        function calculateTotal() {
+            let total = 0;
+
+            // Add amounts from selected checkboxes in Attendees section
+            const checkboxes = document.querySelectorAll('input[name="attendees"]:checked');
+            checkboxes.forEach(checkbox => {
+                total += parseInt(checkbox.getAttribute('data-price'), 10);
+            });
+
+            // Add amount based on selected children option
+            const childrenSelect = document.getElementById('children');
+            const selectedOption = childrenSelect.options[childrenSelect.selectedIndex];
+            total += parseInt(selectedOption.getAttribute('data-price'), 10);
+
+            // Update the total amount display
+            document.getElementById('totalAmount').textContent = `Total: ${total} Rs`;
+        }
+
+        function submitForm() {
+            const form = document.getElementById('registrationForm');
+            
+            // Validate that at least one checkbox is selected in the Attendees section
+            const attendees = document.querySelectorAll('input[name="attendees"]:checked');
+            if (attendees.length === 0) {
+                alert("Please select at least one option under Attendees.");
+                return;
+            }
+
+            // Check the rest of the form validity
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const formData = new FormData(form);
+            let data = {};
+            formData.forEach((value, key) => {
+                if (!data[key]) {
+                    data[key] = value;
+                } else {
+                    if (!Array.isArray(data[key])) {
+                        data[key] = [data[key]];
+                    }
+                    data[key].push(value);
+                }
+            });
+
+            console.log("Form Submitted by:", data.name);
+            console.log("Form Data:", data);
+
+            alert("Thank you for registering!");
+        }
+    </script>
+</body>
+</html>
